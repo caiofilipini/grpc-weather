@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package weather;
+
+service Weather {
+	rpc CurrentConditions(WeatherRequest) returns (WeatherResponse) {}
+}
+
+message WeatherRequest {
+	string location = 1;
+}
+
+message WeatherResponse {
+	double temperature = 1;
+	string description = 2;
+	bool found = 3;
+}

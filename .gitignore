@@ -1,0 +1,3 @@
+**/*.pb.go
+weather_server/server
+weather_client/client
