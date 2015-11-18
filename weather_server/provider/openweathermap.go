@@ -13,18 +13,8 @@ const (
 	openWeatherMapUrl = "http://api.openweathermap.org/data/2.5/weather"
 )
 
-type WeatherProvider interface {
-	Query(string) (WeatherInfo, error)
-}
-
 type OpenWeatherMap struct {
 	ApiKey string
-}
-
-type WeatherInfo struct {
-	Temperature float64
-	Description string
-	Found       bool
 }
 
 func (p OpenWeatherMap) Query(q string) (WeatherInfo, error) {
