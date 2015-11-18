@@ -1,6 +1,6 @@
 # gRPC Weather
 
-Simple gRPC example implemented in Go. It features a server and a client for a service that provides information about the weather, and it relies on [openweathermap.org's API](http://openweathermap.org/api) for that.
+Simple [gRPC](http://www.grpc.io/) example implemented in Go. It features a server and a client for a service that provides information about the weather, and it relies on [openweathermap.org's API](http://openweathermap.org/api) for that.
 
 ## Building and running
 
