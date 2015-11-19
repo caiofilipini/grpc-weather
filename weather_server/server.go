@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"os"
+	"strconv"
 
 	"github.com/caiofilipini/grpc-weather/weather"
 	"github.com/caiofilipini/grpc-weather/weather_server/provider"
@@ -14,7 +16,7 @@ import (
 )
 
 const (
-	port = ":9000"
+	defaultPort = 9000
 )
 
 type server struct {
@@ -41,19 +43,38 @@ func (s server) CurrentConditions(ctx context.Context, req *weather.WeatherReque
 }
 
 func main() {
-	conn, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("Failed to listen on %s: %v", port, err)
-	}
-	log.Println("Listening on", port)
-
 	weatherServer := &server{
 		provider: provider.OpenWeatherMap{
 			ApiKey: os.Getenv("OPEN_WEATHER_MAP_API_KEY"),
 		},
 	}
 
+	conn := listen()
 	grpcServer := grpc.NewServer()
 	weather.RegisterWeatherServer(grpcServer, weatherServer)
 	grpcServer.Serve(conn)
+}
+
+func listen() net.Listener {
+	port := assignPort()
+	listenAddr := fmt.Sprintf(":%d", port)
+
+	conn, err := net.Listen("tcp", listenAddr)
+	if err != nil {
+		log.Fatalf("Failed to listen on %s: %v", port, err)
+	}
+
+	log.Println("Listening on", port)
+	return conn
+}
+
+func assignPort() int {
+	if p := os.Getenv("PORT"); p != "" {
+		port, err := strconv.Atoi(p)
+		if err != nil {
+			log.Fatalf("Invalid port %s", p)
+		}
+		return port
+	}
+	return defaultPort
 }
