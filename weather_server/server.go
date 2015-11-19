@@ -1,11 +1,12 @@
 package main
 
 import (
-	"grcp/weather"
-	"grcp/weather_server/provider"
 	"log"
 	"net"
 	"os"
+
+	"github.com/caiofilipini/grpc-weather/weather"
+	"github.com/caiofilipini/grpc-weather/weather_server/provider"
 
 	"google.golang.org/grpc"
 
