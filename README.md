@@ -49,7 +49,8 @@ An example output:
 If you don't want to mess with your local environment and would prefer running everything in a Docker container, you have two options. The easiest option is running the existing image from [Docker Hub](https://hub.docker.com/r/caiofilipini/grpc-weather/), by running the following command:
 
 ```sh
-$ docker run --rm -p 9000:9000 -e OPEN_WEATHER_MAP_API_KEY="<your-api-key-here>" --name weather_service caiofilipini/grpc-weather:master
+$ docker run --rm -p 9000:9000 -e OPEN_WEATHER_MAP_API_KEY="<your-api-key-here>" \
+  --name weather_service caiofilipini/grpc-weather:master
 ```
 
 This command will pull the image from Docker Hub and run the `weather_server` in a container. Then you can run the client on the same container:
