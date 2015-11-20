@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math"
 	"net/http"
 	"net/url"
@@ -38,7 +39,9 @@ func (p OpenWeatherMap) get(q string) ([]byte, error) {
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Unexpected response: %s", resp.Status)
+		respErr := fmt.Errorf("Unexpected response: %s", resp.Status)
+		log.Println("Request failed:", respErr)
+		return nil, respErr
 	}
 
 	defer resp.Body.Close()
