@@ -59,4 +59,4 @@ This command will pull the image from Docker Hub and run the `weather_server` in
 $ docker exec weather_service weather_client Berlin, Germany
 ```
 
-If you'd rather build the image yourself, just use the provided `Dockerfile` ([here](https://github.com/caiofilipini/grpc-weather/blob/master/Dockerfile)).
+If you'd rather build the image yourself, just use the provided [Dockerfile](https://github.com/caiofilipini/grpc-weather/blob/master/Dockerfile).
