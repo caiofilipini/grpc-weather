@@ -9,3 +9,7 @@ type WeatherInfo struct {
 	Description string
 	Found       bool
 }
+
+var (
+	EmptyResult = WeatherInfo{}
+)

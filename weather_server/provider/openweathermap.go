@@ -20,21 +20,13 @@ type OpenWeatherMap struct {
 func (p OpenWeatherMap) Query(q string) (WeatherInfo, error) {
 	body, err := p.get(q)
 	if err != nil {
-		return WeatherInfo{}, err
+		return EmptyResult, err
 	}
 
 	var result openWeatherMapResult
 	json.Unmarshal(body, &result)
 
-	if result.found() {
-		return WeatherInfo{
-			Temperature: result.toCelcius(),
-			Description: result.description(),
-			Found:       true,
-		}, nil
-	} else {
-		return WeatherInfo{Found: false}, nil
-	}
+	return result.asWeatherInfo(), nil
 }
 
 func (p OpenWeatherMap) get(q string) ([]byte, error) {
@@ -64,6 +56,17 @@ type openWeatherMapResult struct {
 	Weather []struct {
 		Description string `json:"description"`
 	} `json:"weather"`
+}
+
+func (r openWeatherMapResult) asWeatherInfo() WeatherInfo {
+	if r.found() {
+		return WeatherInfo{
+			Temperature: r.toCelcius(),
+			Description: r.description(),
+			Found:       true,
+		}
+	}
+	return EmptyResult
 }
 
 func (r openWeatherMapResult) toCelcius() float64 {
