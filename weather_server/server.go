@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/caiofilipini/grpc-weather/weather"
 	"github.com/caiofilipini/grpc-weather/weather_server/provider"
@@ -43,9 +44,14 @@ func (s server) CurrentConditions(ctx context.Context, req *weather.WeatherReque
 }
 
 func main() {
+	owmApiKey := strings.TrimSpace(os.Getenv("OPEN_WEATHER_MAP_API_KEY"))
+	if owmApiKey == "" {
+		log.Fatal("Missing API key for OpenWeatherMap")
+	}
+
 	weatherServer := &server{
 		provider: provider.OpenWeatherMap{
-			ApiKey: os.Getenv("OPEN_WEATHER_MAP_API_KEY"),
+			ApiKey: owmApiKey,
 		},
 	}
 
