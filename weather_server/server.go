@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/caiofilipini/grpc-weather/weather"
 	"github.com/caiofilipini/grpc-weather/weather_server/provider"
@@ -34,6 +35,7 @@ func (s server) mapResponse(i provider.WeatherInfo) *weather.WeatherResponse {
 
 func (s server) CurrentConditions(ctx context.Context, req *weather.WeatherRequest) (*weather.WeatherResponse, error) {
 	log.Println("Fetching weather information for", req.Location)
+	defer elapsed(time.Now())
 
 	weatherInfo, err := s.provider.Query(req.Location)
 	if err != nil {
@@ -83,4 +85,8 @@ func assignPort() int {
 		return port
 	}
 	return defaultPort
+}
+
+func elapsed(start time.Time) {
+	log.Printf("Request took %s\n", time.Since(start))
 }
