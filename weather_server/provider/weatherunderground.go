@@ -3,9 +3,6 @@ package provider
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
 	"net/url"
 	"strings"
 )
@@ -67,35 +64,16 @@ func (p WeatherUnderground) urlFor(q string) string {
 	return fmt.Sprintf("%s%s.json", baseUrl, queryPart)
 }
 
-func (p WeatherUnderground) getAsJSON(q string) (weatherUndergroundResult, error) {
+func (p WeatherUnderground) getAsJSON(queryUrl string) (weatherUndergroundResult, error) {
 	var result weatherUndergroundResult
 
-	body, err := p.get(q)
+	body, err := httpClient.get(queryUrl)
 	if err != nil {
 		return result, err
 	}
 
 	json.Unmarshal(body, &result)
-
 	return result, nil
-}
-
-func (p WeatherUnderground) get(queryUrl string) ([]byte, error) {
-	log.Println("Querying WU with", queryUrl)
-
-	resp, err := http.Get(queryUrl)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != 200 {
-		respErr := fmt.Errorf("Unexpected response: %s", resp.Status)
-		log.Println("Request failed:", respErr)
-		return nil, respErr
-	}
-
-	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
 }
 
 type weatherUndergroundResult struct {

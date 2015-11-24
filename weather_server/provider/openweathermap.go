@@ -3,10 +3,7 @@ package provider
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"math"
-	"net/http"
 	"net/url"
 )
 
@@ -19,7 +16,8 @@ type OpenWeatherMap struct {
 }
 
 func (p OpenWeatherMap) Query(q string) (WeatherInfo, error) {
-	body, err := p.get(q)
+	queryUrl := fmt.Sprintf("%s?q=%s&appid=%s", openWeatherMapUrl, url.QueryEscape(q), p.ApiKey)
+	body, err := httpClient.get(queryUrl)
 	if err != nil {
 		return EmptyResult, err
 	}
@@ -28,24 +26,6 @@ func (p OpenWeatherMap) Query(q string) (WeatherInfo, error) {
 	json.Unmarshal(body, &result)
 
 	return result.asWeatherInfo(), nil
-}
-
-func (p OpenWeatherMap) get(q string) ([]byte, error) {
-	queryUrl := fmt.Sprintf("%s?q=%s&appid=%s", openWeatherMapUrl, url.QueryEscape(q), p.ApiKey)
-
-	resp, err := http.Get(queryUrl)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != 200 {
-		respErr := fmt.Errorf("Unexpected response: %s", resp.Status)
-		log.Println("Request failed:", respErr)
-		return nil, respErr
-	}
-
-	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
 }
 
 type openWeatherMapResult struct {
