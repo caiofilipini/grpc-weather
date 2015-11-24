@@ -5,17 +5,25 @@ import (
 	"fmt"
 	"math"
 	"net/url"
+	"time"
 )
 
 const (
-	openWeatherMapUrl = "http://api.openweathermap.org/data/2.5/weather"
+	openWeatherMapUrl  = "http://api.openweathermap.org/data/2.5/weather"
+	openWeatherMapName = "OpenWeatherMap"
 )
 
 type OpenWeatherMap struct {
 	ApiKey string
 }
 
+func (p OpenWeatherMap) Name() string {
+	return openWeatherMapName
+}
+
 func (p OpenWeatherMap) Query(q string) (WeatherInfo, error) {
+	defer elapsed(p, time.Now())
+
 	queryUrl := fmt.Sprintf("%s?q=%s&appid=%s", openWeatherMapUrl, url.QueryEscape(q), p.ApiKey)
 	body, err := httpClient.get(queryUrl)
 	if err != nil {

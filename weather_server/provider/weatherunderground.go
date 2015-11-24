@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 )
 
 const (
 	wuUrlTemplate = "http://api.wunderground.com/api/%s/conditions"
+	wuName        = "WeatherUnderground"
 
 	errKeyNotFound   = "keynotfound"
 	errQueryNotFound = "querynotfound"
@@ -18,7 +20,13 @@ type WeatherUnderground struct {
 	ApiKey string
 }
 
+func (p WeatherUnderground) Name() string {
+	return wuName
+}
+
 func (p WeatherUnderground) Query(q string) (WeatherInfo, error) {
+	defer elapsed(p, time.Now())
+
 	result, err := p.getAsJSON(p.urlFor(q))
 	if err != nil {
 		return EmptyResult, err

@@ -1,7 +1,13 @@
 package provider
 
+import (
+	"log"
+	"time"
+)
+
 type WeatherProvider interface {
 	Query(string) (WeatherInfo, error)
+	Name() string
 }
 
 type WeatherInfo struct {
@@ -13,3 +19,7 @@ type WeatherInfo struct {
 var (
 	EmptyResult = WeatherInfo{}
 )
+
+func elapsed(p WeatherProvider, start time.Time) {
+	log.Printf("[%s] Request took %s\n", p.Name(), time.Since(start))
+}
