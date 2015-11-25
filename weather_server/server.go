@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/caiofilipini/grpc-weather/weather"
-	"github.com/caiofilipini/grpc-weather/weather_server/provider"
+	"github.com/caiofilipini/grpc-weather/weather_server/providers"
 
 	"google.golang.org/grpc"
 
@@ -22,15 +22,15 @@ const (
 )
 
 type server struct {
-	providers []*provider.WeatherProvider
+	providers []*providers.WeatherProvider
 }
 
-func (s *server) registerProvider(p provider.WeatherProvider) {
+func (s *server) registerProvider(p providers.WeatherProvider) {
 	s.providers = append(s.providers, &p)
 }
 
 func (s server) queryProviders(q string) (*weather.WeatherResponse, error) {
-	var responses []*provider.WeatherInfo
+	var responses []*providers.WeatherInfo
 	var err error
 
 	for _, p := range s.providers {
@@ -52,7 +52,7 @@ func (s server) queryProviders(q string) (*weather.WeatherResponse, error) {
 	return s.avg(responses), nil
 }
 
-func (s server) avg(responses []*provider.WeatherInfo) *weather.WeatherResponse {
+func (s server) avg(responses []*providers.WeatherInfo) *weather.WeatherResponse {
 	var sumTemp float64 = 0
 	for _, r := range responses {
 		if r.Found {
@@ -86,8 +86,8 @@ func main() {
 	}
 
 	weatherServer := &server{}
-	weatherServer.registerProvider(provider.OpenWeatherMap{ApiKey: owmApiKey})
-	weatherServer.registerProvider(provider.WeatherUnderground{ApiKey: wuApiKey})
+	weatherServer.registerProvider(providers.OpenWeatherMap{ApiKey: owmApiKey})
+	weatherServer.registerProvider(providers.WeatherUnderground{ApiKey: wuApiKey})
 
 	conn := listen()
 	grpcServer := grpc.NewServer()
