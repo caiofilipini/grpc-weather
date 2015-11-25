@@ -101,7 +101,7 @@ func listen() net.Listener {
 
 	conn, err := net.Listen("tcp", listenAddr)
 	if err != nil {
-		log.Fatalf("Failed to listen on %s: %v", port, err)
+		log.Fatalf("Failed to listen on %d: %v", port, err)
 	}
 
 	log.Println("[WeatherServer] Listening on", port)
