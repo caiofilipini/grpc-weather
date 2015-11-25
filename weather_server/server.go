@@ -22,57 +22,23 @@ const (
 )
 
 type server struct {
-	providers []*providers.WeatherProvider
-}
-
-func (s *server) registerProvider(p providers.WeatherProvider) {
-	s.providers = append(s.providers, &p)
-}
-
-func (s server) queryProviders(q string) (*weather.WeatherResponse, error) {
-	var responses []*providers.WeatherInfo
-	var err error
-
-	for _, p := range s.providers {
-		prov := *p
-		resp, e := prov.Query(q)
-		if e != nil {
-			err = e
-		} else {
-			log.Printf("[WeatherServer] Temperature obtained from %s is %.1f\n",
-				prov.Name(), resp.Temperature)
-			responses = append(responses, &resp)
-		}
-	}
-
-	if len(responses) == 0 {
-		return nil, err
-	}
-
-	return s.avg(responses), nil
-}
-
-func (s server) avg(responses []*providers.WeatherInfo) *weather.WeatherResponse {
-	var sumTemp float64 = 0
-	for _, r := range responses {
-		if r.Found {
-			sumTemp += r.Temperature
-		}
-	}
-	avgTemp := sumTemp / float64(len(responses))
-
-	return &weather.WeatherResponse{
-		Temperature: avgTemp,
-		Description: responses[0].Description,
-		Found:       true,
-	}
+	providers *providers.WeatherProviders
 }
 
 func (s server) CurrentConditions(ctx context.Context, req *weather.WeatherRequest) (*weather.WeatherResponse, error) {
 	log.Println("[WeatherServer] Fetching weather information for", req.Location)
 	defer elapsed(time.Now())
 
-	return s.queryProviders(req.Location)
+	response, err := s.providers.Query(req.Location)
+	if err != nil {
+		return nil, err
+	}
+
+	return &weather.WeatherResponse{
+		Temperature: response.Temperature,
+		Description: response.Description,
+		Found:       response.Found,
+	}, nil
 }
 
 func main() {
@@ -85,9 +51,9 @@ func main() {
 		log.Fatal("Missing API key for Weather Underground")
 	}
 
-	weatherServer := &server{}
-	weatherServer.registerProvider(providers.OpenWeatherMap{ApiKey: owmApiKey})
-	weatherServer.registerProvider(providers.WeatherUnderground{ApiKey: wuApiKey})
+	weatherServer := &server{providers: &providers.WeatherProviders{}}
+	weatherServer.providers.Register(providers.OpenWeatherMap{ApiKey: owmApiKey})
+	weatherServer.providers.Register(providers.WeatherUnderground{ApiKey: wuApiKey})
 
 	conn := listen()
 	grpcServer := grpc.NewServer()
