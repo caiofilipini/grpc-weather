@@ -21,6 +21,22 @@ const (
 	defaultPort = 9000
 )
 
+var (
+	owmApiKey string
+	wuApiKey  string
+)
+
+func init() {
+	owmApiKey = strings.TrimSpace(os.Getenv("OPEN_WEATHER_MAP_API_KEY"))
+	wuApiKey = strings.TrimSpace(os.Getenv("WEATHER_UNDERGROUND_API_KEY"))
+	if owmApiKey == "" {
+		log.Fatal("Missing API key for OpenWeatherMap")
+	}
+	if wuApiKey == "" {
+		log.Fatal("Missing API key for Weather Underground")
+	}
+}
+
 type server struct {
 	providers *providers.WeatherProviders
 }
@@ -42,15 +58,6 @@ func (s server) CurrentConditions(ctx context.Context, req *weather.WeatherReque
 }
 
 func main() {
-	owmApiKey := strings.TrimSpace(os.Getenv("OPEN_WEATHER_MAP_API_KEY"))
-	wuApiKey := strings.TrimSpace(os.Getenv("WEATHER_UNDERGROUND_API_KEY"))
-	if owmApiKey == "" {
-		log.Fatal("Missing API key for OpenWeatherMap")
-	}
-	if wuApiKey == "" {
-		log.Fatal("Missing API key for Weather Underground")
-	}
-
 	weatherServer := &server{providers: &providers.WeatherProviders{}}
 	weatherServer.providers.Register(providers.OpenWeatherMap{ApiKey: owmApiKey})
 	weatherServer.providers.Register(providers.WeatherUnderground{ApiKey: wuApiKey})
